@@ -11,27 +11,19 @@ Pilot signup (`pilot.html`) and Sign in (`signin.html`) use the **Supabase JS cl
 - `signUp({ email, password, options.data })`
 - `signInWithPassword({ email, password })`
 
-Passwords go **only** to Supabase Auth. They are never emailed, never sent through FormSubmit, and never POSTed to the Render `/api/auth/*` HMAC routes.
+Passwords go **only** to Supabase Auth. They are never emailed, never sent through FormSubmit, and never POSTed to the Render `/api/auth/*` routes. `STAFFMATCH_API` (`https://staffmatch-api.onrender.com`) is for future API calls only.
 
-Paste keys in `config.js` (Project Settings → API). **Anon public key only — never the service_role key.**
-
-```js
-window.SUPABASE_URL = 'https://YOUR_PROJECT_REF.supabase.co'; // no trailing slash
-window.SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-```
-
-Until those placeholders are replaced, the forms show a clear “accounts aren’t connected yet” message.
+The public **anon** key in `config.js` is intentional for the browser client. **Never add a `service_role` key.**
 
 The Supabase client stores the session. Success copy is: *You’re in — we’ll email when your pilot workspace is ready.* Cancel / Back to StaffMatch / Use a different account always leave the forms.
 
-Optional future API base (not used for public signup):
-
-```js
-window.STAFFMATCH_API = window.STAFFMATCH_API || 'https://staffmatch-api.onrender.com';
-```
+If config is missing or auth fails, the forms show a clear error and do not crash.
 
 ## GitHub Pages
 No build step. Settings → Pages → Deploy from branch → `main` / root.
 Expected URL: https://camkoe13.github.io/staffmatch-site/
 
-Supabase loads from `cdn.jsdelivr.net` (`@supabase/supabase-js@2`). Add `https://camkoe13.github.io` (and `/staffmatch-site` as needed) to the Supabase Auth redirect / site URL allow list when the project exists.
+Supabase Auth → URL configuration should allow:
+
+- Site URL: `https://camkoe13.github.io/staffmatch-site/`
+- Redirect URLs: `https://camkoe13.github.io` and `https://camkoe13.github.io/staffmatch-site/`
