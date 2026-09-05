@@ -1,152 +1,190 @@
 (function (global) {
-  var TOKEN_KEY = 'staffmatch_token';
-  var USER_KEY = 'staffmatch_user';
   var SUPPORT = 'staffmatch.support@gmail.com';
   var UNREACHABLE =
     "Couldn't reach StaffMatch — try again later or email " + SUPPORT + '.';
+  var NOT_CONFIGURED =
+    "StaffMatch accounts aren’t connected yet — try again later or email " + SUPPORT + '.';
+  var client = null;
+  var sessionCache = null;
 
   function apiBase() {
     return String(global.STAFFMATCH_API || 'https://staffmatch-api.onrender.com').replace(/\/$/, '');
   }
 
-  function storeSession(token, user) {
-    try {
-      global.localStorage.setItem(TOKEN_KEY, token);
-      if (user) global.localStorage.setItem(USER_KEY, JSON.stringify(user));
-    } catch (_) {
-      /* private mode / quota — still return the token to the caller */
-    }
+  function trimSlash(url) {
+    return String(url || '').trim().replace(/\/$/, '');
   }
 
-  function getToken() {
-    try {
-      return global.localStorage.getItem(TOKEN_KEY);
-    } catch (_) {
-      return null;
-    }
+  function isConfigured() {
+    var url = trimSlash(global.SUPABASE_URL);
+    var key = String(global.SUPABASE_ANON_KEY || '').trim();
+    if (!url || !key) return false;
+    if (!/^https:\/\//i.test(url)) return false;
+    if (/YOUR_PROJECT_REF|YOUR_SUPABASE|example\.supabase/i.test(url + key)) return false;
+    return true;
   }
 
-  function getUser() {
-    try {
-      var raw = global.localStorage.getItem(USER_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  function clearSession() {
-    try {
-      global.localStorage.removeItem(TOKEN_KEY);
-      global.localStorage.removeItem(USER_KEY);
-    } catch (_) {
-      /* ignore */
-    }
-  }
-
-  function authHeaders(extra) {
-    var headers = { Accept: 'application/json' };
-    if (extra) {
-      Object.keys(extra).forEach(function (key) {
-        headers[key] = extra[key];
-      });
-    }
-    var token = getToken();
-    if (token) headers.Authorization = 'Bearer ' + token;
-    return headers;
-  }
-
-  function parseJsonSafe(text) {
-    if (!text) return {};
-    try {
-      return JSON.parse(text);
-    } catch (_) {
-      return {};
-    }
-  }
-
-  function unreachableError() {
-    var err = new Error(UNREACHABLE);
-    err.code = 'unreachable';
+  function configuredError() {
+    var err = new Error(NOT_CONFIGURED);
+    err.code = 'not_configured';
     return err;
   }
 
-  function readErrorMessage(res, data) {
-    if (data && typeof data.error === 'string' && data.error) return data.error;
-    if (data && typeof data.message === 'string' && data.message) return data.message;
-    if (res.status === 401) return 'Email or password is incorrect.';
-    if (res.status === 409) return 'An account with that email already exists.';
-    if (res.status === 400) return 'Check your details and try again.';
-    if (res.status === 404 || res.status >= 500) return UNREACHABLE;
-    return 'Something went wrong. Try again, or email ' + SUPPORT + '.';
-  }
-
-  function authRequest(path, body) {
-    var url = apiBase() + path;
-    return fetch(url, {
-      method: 'POST',
-      headers: authHeaders({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify(body),
-    })
-      .catch(function () {
-        throw unreachableError();
-      })
-      .then(function (res) {
-        return res.text().then(function (text) {
-          var data = parseJsonSafe(text);
-          if (!res.ok) {
-            var err = new Error(readErrorMessage(res, data));
-            err.status = res.status;
-            err.data = data;
-            throw err;
-          }
-          if (!data || !data.token) {
-            throw new Error('Unexpected response from StaffMatch. Try again.');
-          }
-          storeSession(data.token, data.user);
-          return data;
-        });
-      });
-  }
-
-  function register(payload) {
-    return authRequest('/api/auth/register', payload);
-  }
-
-  function login(payload) {
-    return authRequest('/api/auth/login', payload);
-  }
-
-  /* GET /api/auth/me — for later workspace checks. Landing does not require it. */
-  function me() {
-    var token = getToken();
-    if (!token) {
-      var missing = new Error('Not signed in.');
-      missing.status = 401;
-      return Promise.reject(missing);
+  function getClient() {
+    if (!isConfigured()) throw configuredError();
+    if (client) return client;
+    var create = global.supabase && global.supabase.createClient;
+    if (typeof create !== 'function') {
+      var loadErr = new Error(UNREACHABLE);
+      loadErr.code = 'sdk_missing';
+      throw loadErr;
     }
-    return fetch(apiBase() + '/api/auth/me', {
-      method: 'GET',
-      headers: authHeaders(),
-    })
-      .catch(function () {
-        throw unreachableError();
+    client = create(trimSlash(global.SUPABASE_URL), String(global.SUPABASE_ANON_KEY).trim());
+    return client;
+  }
+
+  function mapAuthError(error) {
+    var msg = (error && (error.message || error.error_description)) || '';
+    var status = error && error.status;
+    var lower = msg.toLowerCase();
+    if (!msg && (status === 0 || error instanceof TypeError)) return UNREACHABLE;
+    if (/invalid login|invalid credentials|invalid email or password/i.test(lower)) {
+      return 'Email or password is incorrect.';
+    }
+    if (/already registered|already exists|user already/i.test(lower)) {
+      return 'An account with that email already exists. Sign in instead.';
+    }
+    if (/email not confirmed/i.test(lower)) {
+      return 'Check your email to confirm this account, then sign in.';
+    }
+    if (/failed to fetch|networkerror|load failed/i.test(lower)) return UNREACHABLE;
+    return msg || 'Something went wrong. Try again, or email ' + SUPPORT + '.';
+  }
+
+  function rememberSession(session) {
+    sessionCache = session || null;
+    return session;
+  }
+
+  function hasSession() {
+    return !!(sessionCache && sessionCache.access_token);
+  }
+
+  function getSession() {
+    return sessionCache;
+  }
+
+  function getToken() {
+    return (sessionCache && sessionCache.access_token) || null;
+  }
+
+  function getUser() {
+    return (sessionCache && sessionCache.user) || null;
+  }
+
+  function refreshSession() {
+    if (!isConfigured()) {
+      rememberSession(null);
+      return Promise.resolve(null);
+    }
+    var sb;
+    try {
+      sb = getClient();
+    } catch (_) {
+      rememberSession(null);
+      return Promise.resolve(null);
+    }
+    return sb.auth.getSession().then(function (result) {
+      if (result.error) {
+        rememberSession(null);
+        return null;
+      }
+      rememberSession(result.data && result.data.session);
+      return sessionCache;
+    }).catch(function () {
+      rememberSession(null);
+      return null;
+    });
+  }
+
+  function signUp(payload) {
+    var sb;
+    try {
+      sb = getClient();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+    var meta = {};
+    if (payload.firstName) meta.first_name = payload.firstName;
+    if (payload.lastName) meta.last_name = payload.lastName;
+    if (payload.phone) meta.phone = payload.phone;
+    return sb.auth
+      .signUp({
+        email: payload.email,
+        password: payload.password,
+        options: { data: meta },
       })
-      .then(function (res) {
-        return res.text().then(function (text) {
-          var data = parseJsonSafe(text);
-          if (!res.ok) {
-            if (res.status === 401) clearSession();
-            var err = new Error(readErrorMessage(res, data));
-            err.status = res.status;
-            err.data = data;
-            throw err;
-          }
-          var user = data.user || data;
-          if (user && typeof user === 'object') storeSession(token, user);
-          return data;
-        });
+      .then(function (result) {
+        if (result.error) {
+          var err = new Error(mapAuthError(result.error));
+          err.status = result.error.status;
+          throw err;
+        }
+        rememberSession(result.data && result.data.session);
+        return result.data;
+      })
+      .catch(function (err) {
+        if (err instanceof TypeError) {
+          var net = new Error(UNREACHABLE);
+          net.code = 'unreachable';
+          throw net;
+        }
+        throw err;
       });
+  }
+
+  function signIn(payload) {
+    var sb;
+    try {
+      sb = getClient();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+    return sb.auth
+      .signInWithPassword({
+        email: payload.email,
+        password: payload.password,
+      })
+      .then(function (result) {
+        if (result.error) {
+          var err = new Error(mapAuthError(result.error));
+          err.status = result.error.status;
+          throw err;
+        }
+        if (!result.data || !result.data.session) {
+          throw new Error('Unexpected response from StaffMatch. Try again.');
+        }
+        rememberSession(result.data.session);
+        return result.data;
+      })
+      .catch(function (err) {
+        if (err instanceof TypeError) {
+          var net = new Error(UNREACHABLE);
+          net.code = 'unreachable';
+          throw net;
+        }
+        throw err;
+      });
+  }
+
+  function clearSession() {
+    sessionCache = null;
+    if (!isConfigured()) return Promise.resolve();
+    try {
+      return getClient().auth.signOut().catch(function () {});
+    } catch (_) {
+      return Promise.resolve();
+    }
   }
 
   function bindPasswordToggles(root) {
@@ -199,24 +237,28 @@
     var switchBtn = panel.querySelector('#auth-switch');
     if (switchBtn) {
       switchBtn.addEventListener('click', function () {
-        clearSession();
-        global.location.reload();
+        clearSession().then(function () {
+          global.location.reload();
+        });
       });
     }
   }
 
   global.StaffMatchAuth = {
     apiBase: apiBase,
-    register: register,
-    login: login,
-    me: me,
+    isConfigured: isConfigured,
+    signUp: signUp,
+    signIn: signIn,
+    refreshSession: refreshSession,
+    hasSession: hasSession,
+    getSession: getSession,
     getToken: getToken,
     getUser: getUser,
-    storeSession: storeSession,
     clearSession: clearSession,
     bindPasswordToggles: bindPasswordToggles,
     setStatus: setStatus,
     showReadyState: showReadyState,
+    NOT_CONFIGURED: NOT_CONFIGURED,
     SUPPORT: SUPPORT,
   };
 })(window);

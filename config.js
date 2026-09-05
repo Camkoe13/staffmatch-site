@@ -1,7 +1,14 @@
-/* StaffMatch marketing site → auth API.
-   Hosted API (Render). No trailing slash.
-   Override before this file loads for local API work, e.g.:
+/* StaffMatch marketing site config.
+   Signup / sign-in use Supabase Auth (anon key only — never a service_role key).
 
-     window.STAFFMATCH_API = 'http://localhost:3001';
+   Cameron: paste the free-project values from
+   Supabase → Project Settings → API, then save.
+
+     window.SUPABASE_URL = 'https://YOUR_PROJECT_REF.supabase.co';  // no trailing slash
+     window.SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 */
+window.SUPABASE_URL = window.SUPABASE_URL || 'https://YOUR_PROJECT_REF.supabase.co';
+window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+
+/* Future StaffMatch API (roster / matching). Not used for public signup. No trailing slash. */
 window.STAFFMATCH_API = window.STAFFMATCH_API || 'https://staffmatch-api.onrender.com';

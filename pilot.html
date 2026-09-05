@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=12" />
+  <link rel="stylesheet" href="styles.css?v=13" />
 </head>
 <body class="page-pilot">
   <div class="app-shell">
@@ -79,6 +79,7 @@
       <a href="mailto:staffmatch.support@gmail.com?subject=StaffMatch%20inquiry">Inquiries</a>
     </footer>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="auth.js"></script>
   <script>
@@ -88,67 +89,70 @@
       var form = document.getElementById('pilot-form');
       var statusEl = document.getElementById('form-status');
       var submitBtn = document.getElementById('pilot-submit');
+      var readyCopy = "We'll email when your pilot workspace is ready. No hosted app to open yet — hang tight.";
 
       auth.bindPasswordToggles(form);
 
-      if (auth.getToken()) {
-        auth.showReadyState(panel, {
-          title: "You're in",
-          body: "We'll email when your pilot workspace is ready. No hosted app to open yet — hang tight."
+      function wireForm() {
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+          auth.setStatus(statusEl);
+
+          var firstName = (form.firstName.value || '').trim();
+          var lastName = (form.lastName.value || '').trim();
+          var email = (form.email.value || '').trim();
+          var password = form.password.value || '';
+          var phone = (form.phone.value || '').trim();
+
+          if (!firstName) {
+            auth.setStatus(statusEl, 'error', 'First name is required.');
+            form.firstName.focus();
+            return;
+          }
+          if (!email || !form.email.checkValidity()) {
+            auth.setStatus(statusEl, 'error', 'A valid email is required.');
+            form.email.focus();
+            return;
+          }
+          if (password.length < 8) {
+            auth.setStatus(statusEl, 'error', 'Password must be at least 8 characters.');
+            form.password.focus();
+            return;
+          }
+          if (!form.agreeTerms.checked) {
+            auth.setStatus(statusEl, 'error', 'Please agree to the Pilot Terms to continue.');
+            form.agreeTerms.focus();
+            return;
+          }
+
+          var payload = { email: email, password: password, firstName: firstName };
+          if (lastName) payload.lastName = lastName;
+          if (phone) payload.phone = phone;
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Creating account…';
+
+          auth.signUp(payload)
+            .then(function () {
+              auth.showReadyState(panel, { title: "You're in", body: readyCopy });
+            })
+            .catch(function (err) {
+              auth.setStatus(statusEl, 'error', err.message || "Couldn't create your account.");
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Create account';
+            });
         });
-        return;
       }
 
-      form.addEventListener('submit', function (event) {
-        event.preventDefault();
-        auth.setStatus(statusEl);
-
-        var firstName = (form.firstName.value || '').trim();
-        var lastName = (form.lastName.value || '').trim();
-        var email = (form.email.value || '').trim();
-        var password = form.password.value || '';
-        var phone = (form.phone.value || '').trim();
-
-        if (!firstName) {
-          auth.setStatus(statusEl, 'error', 'First name is required.');
-          form.firstName.focus();
+      auth.refreshSession().then(function () {
+        if (auth.hasSession()) {
+          auth.showReadyState(panel, { title: "You're in", body: readyCopy });
           return;
         }
-        if (!email || !form.email.checkValidity()) {
-          auth.setStatus(statusEl, 'error', 'A valid email is required.');
-          form.email.focus();
-          return;
+        if (!auth.isConfigured()) {
+          auth.setStatus(statusEl, 'info', auth.NOT_CONFIGURED);
         }
-        if (password.length < 8) {
-          auth.setStatus(statusEl, 'error', 'Password must be at least 8 characters.');
-          form.password.focus();
-          return;
-        }
-        if (!form.agreeTerms.checked) {
-          auth.setStatus(statusEl, 'error', 'Please agree to the Pilot Terms to continue.');
-          form.agreeTerms.focus();
-          return;
-        }
-
-        var payload = { email: email, password: password, firstName: firstName };
-        if (lastName) payload.lastName = lastName;
-        if (phone) payload.phone = phone;
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Creating account…';
-
-        auth.register(payload)
-          .then(function () {
-            auth.showReadyState(panel, {
-              title: "You're in",
-              body: "We'll email when your pilot workspace is ready. No hosted app to open yet — hang tight."
-            });
-          })
-          .catch(function (err) {
-            auth.setStatus(statusEl, 'error', err.message || "Couldn't create your account.");
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Create account';
-          });
+        wireForm();
       });
     })();
   </script>
