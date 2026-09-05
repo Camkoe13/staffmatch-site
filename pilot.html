@@ -20,11 +20,8 @@
     <main>
       <section class="panel" id="auth-panel">
         <p class="eyebrow">Free pilot</p>
-        <h1>Start your 1-month pilot</h1>
-        <p class="muted">
-          Create an account so we can set up your workspace. We load a thin cut of your roster
-          (from exports you send) and run a few real RFPs with you. No charge for the first month.
-        </p>
+        <h1>Create your account</h1>
+        <p class="muted">Then load your roster and start matching people to projects.</p>
 
         <div id="form-status" class="form-status" hidden></div>
 
@@ -89,7 +86,7 @@
       var form = document.getElementById('pilot-form');
       var statusEl = document.getElementById('form-status');
       var submitBtn = document.getElementById('pilot-submit');
-      var readyCopy = "We'll email when your pilot workspace is ready. No hosted app to open yet — hang tight.";
+      var readyCopy = "Your account is ready. Sign in anytime with this email and password.";
 
       auth.bindPasswordToggles(form);
 

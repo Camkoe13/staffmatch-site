@@ -20,10 +20,7 @@
       <section class="panel" id="auth-panel">
         <p class="eyebrow">Account</p>
         <h1>Sign in</h1>
-        <p class="muted">
-          Use the email and password from your pilot account. A full hosted workspace isn’t live yet —
-          signing in just confirms your account so we can email you when it’s ready.
-        </p>
+        <p class="muted">Use the email and password for your account.</p>
 
         <div id="form-status" class="form-status" hidden></div>
 
@@ -65,7 +62,7 @@
       var form = document.getElementById('signin-form');
       var statusEl = document.getElementById('form-status');
       var submitBtn = document.getElementById('signin-submit');
-      var readyCopy = "We'll email when your pilot workspace is ready. No hosted app to open yet — hang tight.";
+      var readyCopy = "You're signed in.";
 
       auth.bindPasswordToggles(form);
 
