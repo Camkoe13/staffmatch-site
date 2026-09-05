@@ -10,10 +10,13 @@ Pilot signup (`pilot.html`) and Sign in (`signin.html`) POST JSON to the StaffMa
 
 - `POST {API}/api/auth/register` `{ email, password, firstName?, lastName?, phone? }` → `{ token, user }`
 - `POST {API}/api/auth/login` `{ email, password }` → `{ token, user }`
+- `GET {API}/api/auth/me` with `Authorization: Bearer {token}` (helper in `auth.js` for later; landing shows success without requiring it)
+
+This is a static site — there is no Vite/`VITE_API_URL`. The API base is `window.STAFFMATCH_API` in `config.js`.
 
 The returned token is stored in `localStorage` (`staffmatch_token`). Passwords go **only** to this API via `fetch` — never FormSubmit, mailto, or query strings.
 
-Base URL lives in `config.js` and defaults to the hosted Render API (no trailing slash):
+Base URL defaults to the hosted Render API (no trailing slash):
 
 ```js
 window.STAFFMATCH_API = window.STAFFMATCH_API || 'https://staffmatch-api.onrender.com';
@@ -23,14 +26,15 @@ GitHub Pages deploys this default, so visitors hit `https://staffmatch-api.onren
 
 For a local API, set the global *before* `config.js` loads:
 
-```js
-window.STAFFMATCH_API = 'http://localhost:3001';
+```html
+<script>window.STAFFMATCH_API = 'http://localhost:3001';</script>
+<script src="config.js"></script>
 ```
 
 The API must allow CORS from `https://camkoe13.github.io`. If it is unreachable, the forms show: *Couldn't reach StaffMatch — try again later or email staffmatch.support@gmail.com*.
 
 ## GitHub Pages
-Settings → Pages → Deploy from branch → `main` / root (or GitHub Actions if added).
+No build step. Settings → Pages → Deploy from branch → `main` / root.
 Expected URL: https://camkoe13.github.io/staffmatch-site/
 
-After merge to `main`, Pages serves the forms against `https://staffmatch-api.onrender.com`.
+After merge to `main`, Pages serves the forms against `https://staffmatch-api.onrender.com`. Cancel / Back to StaffMatch / Use a different account always leave the forms — nothing traps.

@@ -35,6 +35,42 @@
     }
   }
 
+  function clearSession() {
+    try {
+      global.localStorage.removeItem(TOKEN_KEY);
+      global.localStorage.removeItem(USER_KEY);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function authHeaders(extra) {
+    var headers = { Accept: 'application/json' };
+    if (extra) {
+      Object.keys(extra).forEach(function (key) {
+        headers[key] = extra[key];
+      });
+    }
+    var token = getToken();
+    if (token) headers.Authorization = 'Bearer ' + token;
+    return headers;
+  }
+
+  function parseJsonSafe(text) {
+    if (!text) return {};
+    try {
+      return JSON.parse(text);
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function unreachableError() {
+    var err = new Error(UNREACHABLE);
+    err.code = 'unreachable';
+    return err;
+  }
+
   function readErrorMessage(res, data) {
     if (data && typeof data.error === 'string' && data.error) return data.error;
     if (data && typeof data.message === 'string' && data.message) return data.message;
@@ -48,41 +84,27 @@
     var url = apiBase() + path;
     return fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(body),
     })
       .catch(function () {
-        var err = new Error(UNREACHABLE);
-        err.code = 'unreachable';
-        throw err;
+        throw unreachableError();
       })
       .then(function (res) {
-        return res
-          .text()
-          .then(function (text) {
-            var data = {};
-            if (text) {
-              try {
-                data = JSON.parse(text);
-              } catch (_) {
-                data = {};
-              }
-            }
-            if (!res.ok) {
-              var err = new Error(readErrorMessage(res, data));
-              err.status = res.status;
-              err.data = data;
-              throw err;
-            }
-            if (!data || !data.token) {
-              throw new Error('Unexpected response from StaffMatch. Try again.');
-            }
-            storeSession(data.token, data.user);
-            return data;
-          });
+        return res.text().then(function (text) {
+          var data = parseJsonSafe(text);
+          if (!res.ok) {
+            var err = new Error(readErrorMessage(res, data));
+            err.status = res.status;
+            err.data = data;
+            throw err;
+          }
+          if (!data || !data.token) {
+            throw new Error('Unexpected response from StaffMatch. Try again.');
+          }
+          storeSession(data.token, data.user);
+          return data;
+        });
       });
   }
 
@@ -92,6 +114,38 @@
 
   function login(payload) {
     return authRequest('/api/auth/login', payload);
+  }
+
+  /* GET /api/auth/me — for later workspace checks. Landing does not require it. */
+  function me() {
+    var token = getToken();
+    if (!token) {
+      var missing = new Error('Not signed in.');
+      missing.status = 401;
+      return Promise.reject(missing);
+    }
+    return fetch(apiBase() + '/api/auth/me', {
+      method: 'GET',
+      headers: authHeaders(),
+    })
+      .catch(function () {
+        throw unreachableError();
+      })
+      .then(function (res) {
+        return res.text().then(function (text) {
+          var data = parseJsonSafe(text);
+          if (!res.ok) {
+            if (res.status === 401) clearSession();
+            var err = new Error(readErrorMessage(res, data));
+            err.status = res.status;
+            err.data = data;
+            throw err;
+          }
+          var user = data.user || data;
+          if (user && typeof user === 'object') storeSession(token, user);
+          return data;
+        });
+      });
   }
 
   function bindPasswordToggles(root) {
@@ -139,19 +193,26 @@
       '</p>' +
       '<div class="form-actions" style="justify-content:flex-start">' +
       '<a class="btn primary" href="index.html">Back to StaffMatch</a>' +
-      '<a class="btn ghost" href="mailto:' +
-      SUPPORT +
-      '?subject=StaffMatch%20pilot">Email support</a>' +
+      '<button type="button" class="btn ghost" id="auth-switch">Use a different account</button>' +
       '</div>';
+    var switchBtn = panel.querySelector('#auth-switch');
+    if (switchBtn) {
+      switchBtn.addEventListener('click', function () {
+        clearSession();
+        global.location.reload();
+      });
+    }
   }
 
   global.StaffMatchAuth = {
     apiBase: apiBase,
     register: register,
     login: login,
+    me: me,
     getToken: getToken,
     getUser: getUser,
     storeSession: storeSession,
+    clearSession: clearSession,
     bindPasswordToggles: bindPasswordToggles,
     setStatus: setStatus,
     showReadyState: showReadyState,
