@@ -6,7 +6,7 @@
     "Couldn't reach StaffMatch — try again later or email " + SUPPORT + '.';
 
   function apiBase() {
-    return String(global.STAFFMATCH_API || 'http://localhost:3001').replace(/\/$/, '');
+    return String(global.STAFFMATCH_API || 'https://staffmatch-api.onrender.com').replace(/\/$/, '');
   }
 
   function storeSession(token, user) {
