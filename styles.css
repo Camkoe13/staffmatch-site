@@ -1,0 +1,84 @@
+
+:root {
+  --ink: #1a221a;
+  --muted: #5a675a;
+  --paper: #f3f0e8;
+  --card: #fffcf6;
+  --line: #d2cdc0;
+  --accent: #35553a;
+  --clay: #8f6549;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+* { box-sizing: border-box; }
+body { margin: 0; line-height: 1.5; }
+
+.top {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0;
+  background: rgba(243, 240, 232, 0.94);
+  backdrop-filter: blur(8px);
+}
+.brand { font-weight: 600; }
+.nav-cta {
+  text-decoration: none; color: var(--ink);
+  padding: 0.35rem 0.8rem; border: 1px solid var(--line);
+  border-radius: 999px; background: var(--card); font-size: 0.9rem;
+}
+
+main { max-width: 640px; margin: 0 auto; padding: 2.25rem 1.25rem 3.5rem; }
+
+.hero h1 {
+  font-family: "IBM Plex Serif", Georgia, serif;
+  font-size: clamp(1.9rem, 5vw, 2.5rem);
+  line-height: 1.12; letter-spacing: -0.02em;
+  margin: 0 0 0.75rem;
+}
+.lede { color: var(--muted); font-size: 1.1rem; margin: 0 0 1.35rem; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.65rem; }
+
+.btn {
+  display: inline-block; padding: 0.65rem 1rem; border-radius: 8px;
+  text-decoration: none; font-weight: 500; border: 1px solid transparent;
+}
+.btn.primary { background: var(--accent); color: #f6faf6; }
+.btn.ghost { border-color: var(--line); color: var(--ink); }
+
+.watch { margin: 2rem 0; }
+.video-slot {
+  aspect-ratio: 16 / 9;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: var(--muted); text-align: center; gap: 0.35rem;
+}
+.video-slot span { font-weight: 600; color: var(--ink); }
+.video-slot p { margin: 0; font-size: 0.9rem; }
+
+.beats {
+  display: grid; gap: 1rem;
+  margin: 2rem 0;
+}
+.beats > div {
+  padding: 1rem 1.1rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.beats h2 { font-size: 1rem; margin: 0 0 0.25rem; }
+.beats p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+.try {
+  margin-top: 2rem; padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+.try h2 {
+  font-family: "IBM Plex Serif", Georgia, serif;
+  font-size: 1.35rem; margin: 0 0 0.5rem;
+}
+.try p { color: var(--muted); }
+.tiny { font-size: 0.8rem; color: var(--muted); margin-top: 1rem; }
