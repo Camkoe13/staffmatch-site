@@ -77,6 +77,7 @@
     if (res.status === 401) return 'Email or password is incorrect.';
     if (res.status === 409) return 'An account with that email already exists.';
     if (res.status === 400) return 'Check your details and try again.';
+    if (res.status === 404 || res.status >= 500) return UNREACHABLE;
     return 'Something went wrong. Try again, or email ' + SUPPORT + '.';
   }
 
