@@ -57,6 +57,7 @@ a { color: var(--accent); }
   color: #fff;
 }
 .btn.ghost { background: rgba(255, 253, 248, 0.85); }
+.btn[disabled] { opacity: 0.65; cursor: wait; }
 
 .bubble {
   display: inline-flex;
@@ -191,6 +192,41 @@ a { color: var(--accent); }
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.hint { font-size: 0.8rem; color: var(--muted); }
+.tiny { font-size: 0.85rem; color: var(--muted); margin: 0; }
+.password-wrap { position: relative; }
+.password-wrap input { width: 100%; padding-right: 4.4rem; }
+.toggle-pass {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.toggle-pass:hover { color: var(--ink); }
+.form-status {
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.92rem;
+  margin-bottom: 4px;
+}
+.form-status.error {
+  background: #f8e8e6;
+  color: #6d2a24;
+  border: 1px solid #e4c4bf;
+}
+.form-status.info {
+  background: var(--accent-soft);
+  color: #0d4a3d;
+  border: 1px solid #b7d6cc;
 }
 .field-row {
   display: grid;

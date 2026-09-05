@@ -4,53 +4,54 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Free 1-month pilot · StaffMatch</title>
-  <meta name="description" content="Start a free 1-month StaffMatch pilot." />
+  <meta name="description" content="Create a StaffMatch pilot account with email and password." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=12" />
 </head>
 <body class="page-pilot">
   <div class="app-shell">
     <header class="topbar">
       <a class="wordmark" href="index.html">StaffMatch</a>
-      <a class="btn ghost" href="mailto:staffmatch.support@gmail.com?subject=StaffMatch%20inquiry">Inquiries</a>
+      <a class="btn ghost" href="signin.html">Sign in</a>
     </header>
 
     <main>
-      <section class="panel">
+      <section class="panel" id="auth-panel">
         <p class="eyebrow">Free pilot</p>
         <h1>Start your 1-month pilot</h1>
         <p class="muted">
-          We load a thin cut of your roster (from exports you send) and run a few real RFPs with you.
-          No charge for the first month while we learn together.
+          Create an account so we can set up your workspace. We load a thin cut of your roster
+          (from exports you send) and run a few real RFPs with you. No charge for the first month.
         </p>
 
-        <form
-          class="pilot-form"
-          action="https://formsubmit.co/staffmatch.support@gmail.com"
-          method="POST"
-        >
-          <input type="hidden" name="_subject" value="StaffMatch free pilot signup" />
-          <input type="hidden" name="_captcha" value="false" />
-          <input type="hidden" name="_template" value="table" />
-          <input type="hidden" name="_next" value="https://camkoe13.github.io/staffmatch-site/pilot.html?thanks=1" />
-          <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <div id="form-status" class="form-status" hidden></div>
 
+        <form class="pilot-form" id="pilot-form" novalidate>
           <div class="field-row">
             <label class="field">
               <span class="field-label">First name <span class="req">*</span></span>
-              <input type="text" name="first_name" required autocomplete="given-name" />
+              <input type="text" name="firstName" required autocomplete="given-name" />
             </label>
             <label class="field">
               <span class="field-label">Last name <span class="opt">optional</span></span>
-              <input type="text" name="last_name" autocomplete="family-name" />
+              <input type="text" name="lastName" autocomplete="family-name" />
             </label>
           </div>
 
           <label class="field">
-            <span class="field-label">Email <span class="opt">optional</span></span>
-            <input type="email" name="email" autocomplete="email" placeholder="you@firm.com" />
+            <span class="field-label">Email <span class="req">*</span></span>
+            <input type="email" name="email" required autocomplete="email" placeholder="you@firm.com" />
+          </label>
+
+          <label class="field">
+            <span class="field-label">Password <span class="req">*</span></span>
+            <div class="password-wrap">
+              <input type="password" name="password" required minlength="8" autocomplete="new-password" />
+              <button type="button" class="toggle-pass" data-toggle-password aria-label="Show password" aria-pressed="false">Show</button>
+            </div>
+            <span class="hint">At least 8 characters. This stays between you and StaffMatch — it is never emailed.</span>
           </label>
 
           <label class="field">
@@ -59,29 +60,97 @@
           </label>
 
           <label class="check">
-            <input type="checkbox" name="agree_terms" value="yes" required />
+            <input type="checkbox" name="agreeTerms" required />
             <span>I agree to the <a href="pilot-terms.html" target="_blank" rel="noopener">Pilot Terms</a></span>
           </label>
 
           <div class="form-actions">
             <a class="btn ghost" href="index.html">Cancel</a>
-            <button type="submit" class="btn primary">Start free pilot</button>
+            <button type="submit" class="btn primary" id="pilot-submit">Create account</button>
           </div>
+
+          <p class="tiny">Already have an account? <a href="signin.html">Sign in</a></p>
         </form>
       </section>
     </main>
 
     <footer class="site-foot inset">
       <span>Independent product — not tied to any employer.</span>
+      <a href="mailto:staffmatch.support@gmail.com?subject=StaffMatch%20inquiry">Inquiries</a>
     </footer>
   </div>
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
   <script>
-    if (new URLSearchParams(location.search).get('thanks') === '1') {
-      const panel = document.querySelector('.panel');
-      if (panel) {
-        panel.innerHTML = '<p class="eyebrow">Thanks</p><h1>You are on the list</h1><p class="muted">We will follow up soon. Meanwhile you can reply anytime via Inquiries.</p><p style="margin-top:1.25rem"><a class="btn primary" href="index.html">Back to StaffMatch</a></p>';
+    (function () {
+      var auth = window.StaffMatchAuth;
+      var panel = document.getElementById('auth-panel');
+      var form = document.getElementById('pilot-form');
+      var statusEl = document.getElementById('form-status');
+      var submitBtn = document.getElementById('pilot-submit');
+
+      auth.bindPasswordToggles(form);
+
+      if (auth.getToken()) {
+        auth.showReadyState(panel, {
+          title: "You're in",
+          body: "We'll email when your pilot workspace is ready. No hosted app to open yet — hang tight."
+        });
+        return;
       }
-    }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        auth.setStatus(statusEl);
+
+        var firstName = (form.firstName.value || '').trim();
+        var lastName = (form.lastName.value || '').trim();
+        var email = (form.email.value || '').trim();
+        var password = form.password.value || '';
+        var phone = (form.phone.value || '').trim();
+
+        if (!firstName) {
+          auth.setStatus(statusEl, 'error', 'First name is required.');
+          form.firstName.focus();
+          return;
+        }
+        if (!email || !form.email.checkValidity()) {
+          auth.setStatus(statusEl, 'error', 'A valid email is required.');
+          form.email.focus();
+          return;
+        }
+        if (password.length < 8) {
+          auth.setStatus(statusEl, 'error', 'Password must be at least 8 characters.');
+          form.password.focus();
+          return;
+        }
+        if (!form.agreeTerms.checked) {
+          auth.setStatus(statusEl, 'error', 'Please agree to the Pilot Terms to continue.');
+          form.agreeTerms.focus();
+          return;
+        }
+
+        var payload = { email: email, password: password, firstName: firstName };
+        if (lastName) payload.lastName = lastName;
+        if (phone) payload.phone = phone;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating account…';
+
+        auth.register(payload)
+          .then(function () {
+            auth.showReadyState(panel, {
+              title: "You're in",
+              body: "We'll email when your pilot workspace is ready. No hosted app to open yet — hang tight."
+            });
+          })
+          .catch(function (err) {
+            auth.setStatus(statusEl, 'error', err.message || "Couldn't create your account.");
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create account';
+          });
+      });
+    })();
   </script>
 </body>
 </html>
