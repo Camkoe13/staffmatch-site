@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Free 1-month pilot · StaffMatch</title>
+  <meta name="description" content="Start a free 1-month StaffMatch pilot." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page-pilot">
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="wordmark" href="index.html">StaffMatch</a>
+      <a class="btn ghost" href="mailto:staffmatch.support@gmail.com?subject=StaffMatch%20inquiry">Inquiries</a>
+    </header>
+
+    <main>
+      <section class="panel">
+        <p class="eyebrow">Free pilot</p>
+        <h1>Start your 1-month pilot</h1>
+        <p class="muted">
+          We load a thin cut of your roster (from exports you send) and run a few real RFPs with you.
+          No charge for the first month while we learn together.
+        </p>
+
+        <form
+          class="pilot-form"
+          action="https://formsubmit.co/staffmatch.support@gmail.com"
+          method="POST"
+        >
+          <input type="hidden" name="_subject" value="StaffMatch free pilot signup" />
+          <input type="hidden" name="_captcha" value="false" />
+          <input type="hidden" name="_template" value="table" />
+          <input type="hidden" name="_next" value="https://camkoe13.github.io/staffmatch-site/pilot.html?thanks=1" />
+          <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <div class="field-row">
+            <label class="field">
+              <span class="field-label">First name <span class="req">*</span></span>
+              <input type="text" name="first_name" required autocomplete="given-name" />
+            </label>
+            <label class="field">
+              <span class="field-label">Last name <span class="opt">optional</span></span>
+              <input type="text" name="last_name" autocomplete="family-name" />
+            </label>
+          </div>
+
+          <label class="field">
+            <span class="field-label">Email <span class="opt">optional</span></span>
+            <input type="email" name="email" autocomplete="email" placeholder="you@firm.com" />
+          </label>
+
+          <label class="field">
+            <span class="field-label">Phone <span class="opt">optional</span></span>
+            <input type="tel" name="phone" autocomplete="tel" />
+          </label>
+
+          <label class="check">
+            <input type="checkbox" name="agree_terms" value="yes" required />
+            <span>I agree to the <a href="pilot-terms.html" target="_blank" rel="noopener">Pilot Terms</a></span>
+          </label>
+
+          <div class="form-actions">
+            <a class="btn ghost" href="index.html">Cancel</a>
+            <button type="submit" class="btn primary">Start free pilot</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-foot inset">
+      <span>Independent product — not tied to any employer.</span>
+    </footer>
+  </div>
+  <script>
+    if (new URLSearchParams(location.search).get('thanks') === '1') {
+      const panel = document.querySelector('.panel');
+      if (panel) {
+        panel.innerHTML = '<p class="eyebrow">Thanks</p><h1>You are on the list</h1><p class="muted">We will follow up soon. Meanwhile you can reply anytime via Inquiries.</p><p style="margin-top:1.25rem"><a class="btn primary" href="index.html">Back to StaffMatch</a></p>';
+      }
+    }
+  </script>
+</body>
+</html>
