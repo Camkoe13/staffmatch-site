@@ -227,3 +227,22 @@ a { color: var(--accent); }
   gap: 12px;
   padding: 22px 24px 8px;
 }
+
+.brand-lines {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0 auto;
+  max-width: 52rem;
+  font-size: clamp(1.35rem, 3.2vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+  text-align: left;
+}
+.brand-lines span { display: block; }
+.hero-band {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 18px 24px 24px;
+  text-align: left;
+}
