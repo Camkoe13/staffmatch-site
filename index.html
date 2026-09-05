@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>StaffMatch</title>
-  <meta name="description" content="Paste the RFP. See who on your team actually fits - and why." />
+  <meta name="description" content="Paste the RFP. See who on your team actually fits — and why." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet" />
@@ -12,56 +12,95 @@
 </head>
 <body>
   <header class="top">
-    <div class="brand">StaffMatch</div>
-    <a class="nav-cta" href="#try">Try a free pilot</a>
+    <a class="brand" href="#">
+      <span class="brand-mark" aria-hidden="true">SM</span>
+      <span class="brand-name">StaffMatch</span>
+    </a>
+    <a class="nav-cta" href="#pilot">Free 1-month pilot</a>
   </header>
 
   <main>
     <section class="hero">
-      <h1>Who on your team fits this RFP?</h1>
-      <p class="lede">Paste the need. Get a shortlist from your own people - with the why, not a vibes search.</p>
-      <div class="actions">
-        <a class="btn primary" href="#try">Try a free pilot</a>
-        <a class="btn ghost" href="#watch">Watch how it works</a>
+      <div class="brand-lockup">
+        <span class="brand-mark lg" aria-hidden="true">SM</span>
+        <div>
+          <h1>StaffMatch</h1>
+          <p class="tagline">Who on your team fits this RFP?</p>
+        </div>
       </div>
+      <p class="lede">Paste the need. Get a shortlist from your own people — with the why, not a vibes search.</p>
     </section>
 
     <section id="watch" class="watch">
-      <div class="video-frame">
+      <div class="video-frame video-frame-lg">
         <video
-          controls
+          autoplay
+          muted
+          loop
           playsinline
+          controls
           preload="metadata"
-          poster=""
           aria-label="StaffMatch demo walkthrough"
         >
           <source src="demo.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
         </video>
       </div>
-      <p class="video-caption">~1 min demo — roster, RFP match, and proposal-ready fits. Captions coming soon.</p>
     </section>
 
-    <section class="beats">
-      <div>
-        <h2>Your roster</h2>
-        <p>People, skills, what they have shipped.</p>
-      </div>
-      <div>
-        <h2>The ask</h2>
-        <p>RFP snippet or staffing note. Paste it.</p>
-      </div>
-      <div>
-        <h2>The shortlist</h2>
-        <p>Who fits, why, ready to put in a proposal.</p>
-      </div>
-    </section>
+    <section id="pilot" class="try">
+      <h2>Free 1-month pilot</h2>
+      <p>
+        We load a thin cut of your roster (from exports you send) and run a few real RFPs with you.
+        No charge for the first month while we learn together.
+      </p>
 
-    <section id="try" class="try">
-      <h2>Free pilot</h2>
-      <p>We load a thin cut of your roster (from exports you send) and run a few real RFPs with you. No charge while we are learning. If it sticks, we talk about paid later.</p>
-      <a class="btn primary" href="mailto:staffmatch.support@gmail.com?subject=StaffMatch%20free%20pilot&body=Firm%3A%0ARole%3A%0AOne%20line%20on%20how%20you%20staff%20today%3A%0A">Email to start</a>
-      <p class="tiny">Independent product - not tied to any employer.</p>
+      <form
+        class="pilot-form"
+        action="https://formsubmit.co/staffmatch.support@gmail.com"
+        method="POST"
+      >
+        <input type="hidden" name="_subject" value="StaffMatch free pilot signup" />
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="hidden" name="_template" value="table" />
+        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true" />
+
+        <div class="name-row">
+          <label>
+            <span>First name <em>*</em></span>
+            <input type="text" name="first_name" required autocomplete="given-name" placeholder="First name" />
+          </label>
+          <label>
+            <span>Last name <span class="opt">(optional)</span></span>
+            <input type="text" name="last_name" autocomplete="family-name" placeholder="Last name" />
+          </label>
+        </div>
+
+        <label>
+          <span>Email <span class="opt">(optional)</span></span>
+          <input type="email" name="email" autocomplete="email" placeholder="you@firm.com" />
+        </label>
+
+        <label>
+          <span>Phone <span class="opt">(optional)</span></span>
+          <input type="tel" name="phone" autocomplete="tel" placeholder="Phone number" />
+        </label>
+
+        <label class="check">
+          <input type="checkbox" name="agree_terms" value="yes" required />
+          <span>I agree to the <a href="pilot-terms.html" target="_blank" rel="noopener">Pilot Terms</a></span>
+        </label>
+
+        <button type="submit" class="btn primary">Start free pilot</button>
+      </form>
+
+      <div class="inquiry-row">
+        <a
+          class="btn ghost"
+          href="mailto:staffmatch.support@gmail.com?subject=StaffMatch%20inquiry"
+        >Inquiries</a>
+      </div>
+
+      <p class="tiny">Independent product — not tied to any employer.</p>
     </section>
   </main>
 </body>
