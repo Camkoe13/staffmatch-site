@@ -258,6 +258,23 @@ a { color: var(--accent); }
   height: 0;
   width: 0;
 }
+.page-pilot .app-shell {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 24px;
+}
+.page-pilot main {
+  flex: 1 0 auto;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: 24px 0;
+}
+.page-pilot .panel {
+  width: 100%;
+  max-width: 480px;
+}
+
 .terms-list {
   color: var(--muted);
   padding-left: 1.2rem;
