@@ -23,35 +23,46 @@
         <p class="muted">A short account of what a model sees, who hosts it, and what StaffMatch keeps. Last updated September 6, 2026.</p>
 
         <h2>What a model does — and what it does not</h2>
-        <p>StaffMatch uses a language model for one step: turning uploaded document text into structured fields. Matching people to projects is not a model call.</p>
+        <p>StaffMatch uses a language model for one simple task: reading your uploaded documents and pulling out key information like skills, roles, and requirements. The actual matching of people to projects happens without AI.</p>
         <ul class="doc-list">
-          <li><strong>Extract.</strong> When you add a resume, proposal, or RFP, we pull the text from the file and send that text to a model so it can fill structured fields (for example skills, roles, and requirements). The rest of the product works from those fields.</li>
-          <li><strong>Match.</strong> Ranking compares keywords and overlapping fields with a deterministic score. It does not ask a model who is “best.”</li>
+          <li><strong>Extract.</strong> When you upload a resume, proposal, or RFP, we read the text and ask a language model to identify important details — things like names, skills, job titles, and project requirements. This organized information is what powers the rest of StaffMatch.</li>
+          <li><strong>Match.</strong> Finding the right people for projects works by comparing those organized details — no AI involved. We look for keyword matches and overlapping skills using straightforward scoring.</li>
         </ul>
-        <p>Matching output is assistive. You remain responsible for staffing and proposal decisions.</p>
+        <p>StaffMatch helps you make better decisions faster, but you're always in control of your staffing and proposal choices.</p>
 
-        <h2>Provider and model</h2>
-        <p>Extract requests go through <a href="https://openrouter.ai/" rel="noopener">OpenRouter</a>. The model ID is set in server configuration, not in this marketing site.</p>
-        <p>Right now we try a free OpenRouter model first. If that route is rate-limited, we fall back to <code>inclusionai/ling-3.0-flash</code>, a paid OpenRouter route.</p>
+        <h2>The AI service we use</h2>
+        <p>We send documents to a language model through <a href="https://openrouter.ai/" rel="noopener">OpenRouter</a>, a service that connects to various AI providers.</p>
+        <details class="tech-details">
+          <summary><strong>More info</strong></summary>
+          <p>The specific model ID is configured on our server (not visible in this public site). Extract requests route through OpenRouter's API.</p>
+        </details>
 
         <h2>Training</h2>
         <p>StaffMatch does not train its own models on your documents.</p>
-        <p>OpenRouter is a routing layer in front of an upstream model host. We do not control OpenRouter’s account settings or that host’s training policy, and we cannot promise either from this page.</p>
-        <p>OpenRouter’s public documentation (as of this writing) says:</p>
+        <p>OpenRouter is a routing layer that connects to various AI model providers. We don't control their account settings or training policies.</p>
+        <p>Here's what OpenRouter's public documentation says (as of this writing):</p>
         <ul class="doc-list">
-          <li>They do not store prompt or response content unless an account opts in. They do store request metadata such as token counts, latency, and model. See <a href="https://openrouter.ai/docs/guides/privacy/data-collection" rel="noopener">Data Collection</a>.</li>
-          <li>They do not use inputs or outputs to train OpenRouter’s own models. See their <a href="https://openrouter.ai/privacy" rel="noopener">Privacy Policy</a>.</li>
-          <li>Downstream hosts have their own logging and training rules. Free endpoints, in particular, may allow a host to train on requests. OpenRouter documents this on <a href="https://openrouter.ai/docs/guides/privacy/provider-logging" rel="noopener">Provider Logging</a> and on each model page.</li>
+          <li>They don't store your prompts or responses unless you specifically opt in. They do keep basic request information like token counts and which model was used. See <a href="https://openrouter.ai/docs/guides/privacy/data-collection" rel="noopener">Data Collection</a>.</li>
+          <li>They don't use your inputs or outputs to train OpenRouter's own models. See their <a href="https://openrouter.ai/privacy" rel="noopener">Privacy Policy</a>.</li>
+          <li>The companies that actually run the AI models have their own rules about data logging and training. Free models in particular may allow the provider to train on your requests. OpenRouter documents this on <a href="https://openrouter.ai/docs/guides/privacy/provider-logging" rel="noopener">Provider Logging</a> and on each model page.</li>
         </ul>
-        <p>If you need a no-training or zero-retention path, that has to be confirmed on OpenRouter and the chosen host. We will not claim it here.</p>
+        <p>If you need guaranteed no-training or zero-retention handling, you'll need to confirm that directly with OpenRouter and the specific AI provider. We can't make that promise here.</p>
+        <details class="tech-details">
+          <summary><strong>More info</strong></summary>
+          <p>OpenRouter functions as middleware between StaffMatch and upstream model hosts. Each host (e.g., OpenAI, Anthropic, or others) maintains separate logging, retention, and training policies. Free-tier OpenRouter routes may allow the upstream provider to use requests for training purposes. Consult OpenRouter's provider-specific documentation and the host's terms of service for binding commitments.</p>
+        </details>
 
         <h2>What StaffMatch keeps</h2>
         <ul class="doc-list">
-          <li>We store the structured extract in Postgres.</li>
-          <li>We do not retain original uploaded PDFs by default.</li>
-          <li>If a local JSON file is written on the app server, that path sits on Render’s disk. On the free plan that disk is ephemeral — files there are lost on restart, redeploy, or spin-down.</li>
+          <li>We save the key fields pulled from your documents — things like names, skills, and requirements — in our database.</li>
+          <li>We don't keep the original PDF files you upload by default.</li>
+          <li>Any temporary files created during processing live on our server's disk, which is wiped clean whenever the server restarts or redeploys.</li>
         </ul>
-        <p>We do not sell your information. Account passwords go only to Supabase Auth — never by email and never through this site’s marketing forms. See the <a href="pilot-terms.html">Pilot Terms</a>.</p>
+        <p>We do not sell your information. Account passwords go only to Supabase Auth — never by email and never through this site's marketing forms. See the <a href="pilot-terms.html">Pilot Terms</a>.</p>
+        <details class="tech-details">
+          <summary><strong>More info</strong></summary>
+          <p>Structured extracts are persisted in Postgres. Original uploaded files are not retained by default. Temporary JSON artifacts may be written to the app server's filesystem (Render ephemeral disk on the free plan; lost on restart, redeploy, or spin-down).</p>
+        </details>
 
         <h2>Questions</h2>
         <p>Email <a href="mailto:staffmatch.support@gmail.com">staffmatch.support@gmail.com</a>.</p>
