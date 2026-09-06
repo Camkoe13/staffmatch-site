@@ -131,6 +131,7 @@
 
           auth.signUp(payload)
             .then(function () {
+              if (auth.redirectToAppIfConfigured()) return;
               auth.showReadyState(panel, { title: "You're in", body: readyCopy });
             })
             .catch(function (err) {
@@ -143,6 +144,7 @@
 
       auth.refreshSession().then(function () {
         if (auth.hasSession()) {
+          if (auth.redirectToAppIfConfigured()) return;
           auth.showReadyState(panel, { title: "You're in", body: readyCopy });
           return;
         }

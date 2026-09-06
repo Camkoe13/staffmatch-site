@@ -15,7 +15,12 @@ Passwords go **only** to Supabase Auth. They are never emailed, never sent throu
 
 The public **anon** key in `config.js` is intentional for the browser client. **Never add a `service_role` key.**
 
-The Supabase client stores the session. Success copy is: *You’re in — we’ll email when your pilot workspace is ready.* Cancel / Back to StaffMatch / Use a different account always leave the forms.
+The Supabase client stores the session in the browser (localStorage). After successful signup or sign-in:
+
+- If `STAFFMATCH_APP_URL` in `config.js` is set (optional; leave `''` until a hosted app is live), the browser redirects there. The app must use the same Supabase project so it can read that session.
+- If unset, the site shows honest success copy and does not promise a hosted app.
+
+Cancel / Back to StaffMatch / Use a different account always leave the forms.
 
 If config is missing or auth fails, the forms show a clear error and do not crash.
 
