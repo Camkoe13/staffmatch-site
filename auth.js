@@ -273,6 +273,34 @@
     }
   }
 
+  function showAlreadySignedInState(panel) {
+    if (!panel) return;
+    var url = appUrl();
+    var hasAppUrl = !!url;
+    panel.innerHTML =
+      '<p class="eyebrow">Account</p>' +
+      '<h1>You\'re already signed in</h1>' +
+      '<p class="muted">You have an active session. Open the app or sign in with a different account.</p>' +
+      '<div class="form-actions" style="justify-content:flex-start">' +
+      (hasAppUrl ? '<button type="button" class="btn primary" id="auth-open-app">Open app</button>' : '') +
+      '<button type="button" class="btn ghost" id="auth-switch">Use a different account</button>' +
+      '</div>';
+    var openBtn = panel.querySelector('#auth-open-app');
+    if (openBtn) {
+      openBtn.addEventListener('click', function () {
+        redirectToAppIfConfigured();
+      });
+    }
+    var switchBtn = panel.querySelector('#auth-switch');
+    if (switchBtn) {
+      switchBtn.addEventListener('click', function () {
+        clearSession().then(function () {
+          global.location.reload();
+        });
+      });
+    }
+  }
+
   global.StaffMatchAuth = {
     apiBase: apiBase,
     appUrl: appUrl,
@@ -289,6 +317,7 @@
     bindPasswordToggles: bindPasswordToggles,
     setStatus: setStatus,
     showReadyState: showReadyState,
+    showAlreadySignedInState: showAlreadySignedInState,
     NOT_CONFIGURED: NOT_CONFIGURED,
     SUPPORT: SUPPORT,
   };
