@@ -11,6 +11,17 @@
     return String(global.STAFFMATCH_API || 'https://staffmatch-api.onrender.com').replace(/\/$/, '');
   }
 
+  function appUrl() {
+    return String(global.STAFFMATCH_APP_URL || '').trim();
+  }
+
+  function redirectToAppIfConfigured() {
+    var url = appUrl();
+    if (!url) return false;
+    global.location.assign(url);
+    return true;
+  }
+
   function trimSlash(url) {
     return String(url || '').trim().replace(/\/$/, '');
   }
@@ -217,6 +228,7 @@
   }
 
   function showReadyState(panel, opts) {
+    if (redirectToAppIfConfigured()) return;
     if (!panel) return;
     var title = (opts && opts.title) || "You're in";
     var body =
@@ -246,6 +258,8 @@
 
   global.StaffMatchAuth = {
     apiBase: apiBase,
+    appUrl: appUrl,
+    redirectToAppIfConfigured: redirectToAppIfConfigured,
     isConfigured: isConfigured,
     signUp: signUp,
     signIn: signIn,
