@@ -68,6 +68,26 @@
 
           <p class="tiny">Already have an account? <a href="signin.html">Sign in</a></p>
         </form>
+
+        <hr style="margin: 2rem 0; border: none; border-top: 1px solid #e0e0e0;" />
+
+        <div id="guest-browse-section">
+          <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Browse the demo without an account</h2>
+          <p class="muted" style="margin-bottom: 1rem;">Explore StaffMatch as a guest. No account required.</p>
+
+          <div id="guest-status" class="form-status" hidden></div>
+
+          <form id="guest-form" novalidate>
+            <label class="check">
+              <input type="checkbox" name="agreeTermsGuest" required />
+              <span>I agree to the <a href="pilot-terms.html" target="_blank" rel="noopener">Pilot Terms</a></span>
+            </label>
+
+            <div class="form-actions" style="justify-content: flex-start;">
+              <button type="submit" class="btn primary" id="guest-submit">Browse demo</button>
+            </div>
+          </form>
+        </div>
       </section>
     </main>
 
@@ -145,16 +165,48 @@
         });
       }
 
+      function wireGuestBrowse() {
+        var guestSection = document.getElementById('guest-browse-section');
+        var guestForm = document.getElementById('guest-form');
+        var guestStatusEl = document.getElementById('guest-status');
+        var guestSubmitBtn = document.getElementById('guest-submit');
+
+        if (!guestForm || !guestSection) return;
+
+        guestForm.addEventListener('submit', function (event) {
+          event.preventDefault();
+          auth.setStatus(guestStatusEl);
+
+          if (!guestForm.agreeTermsGuest.checked) {
+            auth.setStatus(guestStatusEl, 'error', 'Please agree to the Pilot Terms to continue.');
+            guestForm.agreeTermsGuest.focus();
+            return;
+          }
+
+          var appUrl = auth.appUrl();
+          if (!appUrl) {
+            auth.setStatus(guestStatusEl, 'error', 'Demo is not available right now. Try again later or email ' + auth.SUPPORT + '.');
+            return;
+          }
+
+          guestSubmitBtn.disabled = true;
+          guestSubmitBtn.textContent = 'Opening demo…';
+          window.location.assign(appUrl);
+        });
+      }
+
       auth.refreshSession().then(function () {
         if (auth.hasSession()) {
-          if (auth.redirectToAppIfConfigured()) return;
-          auth.showReadyState(panel, { title: "You're in", body: readyCopy });
+          auth.showAlreadySignedInState(panel);
+          var guestSection = document.getElementById('guest-browse-section');
+          if (guestSection) guestSection.style.display = 'none';
           return;
         }
         if (!auth.isConfigured()) {
           auth.setStatus(statusEl, 'info', auth.NOT_CONFIGURED);
         }
         wireForm();
+        wireGuestBrowse();
       });
     })();
   </script>
