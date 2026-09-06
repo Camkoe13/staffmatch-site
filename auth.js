@@ -18,6 +18,23 @@
   function redirectToAppIfConfigured() {
     var url = appUrl();
     if (!url) return false;
+    var session = getSession();
+    if (session && session.access_token) {
+      var params = [];
+      params.push('access_token=' + encodeURIComponent(session.access_token));
+      if (session.refresh_token) {
+        params.push('refresh_token=' + encodeURIComponent(session.refresh_token));
+      }
+      if (session.expires_in != null) {
+        params.push('expires_in=' + encodeURIComponent(String(session.expires_in)));
+      }
+      if (session.expires_at != null) {
+        params.push('expires_at=' + encodeURIComponent(String(session.expires_at)));
+      }
+      params.push('token_type=' + encodeURIComponent(session.token_type || 'bearer'));
+      params.push('type=signup');
+      url = url + '#' + params.join('&');
+    }
     global.location.assign(url);
     return true;
   }

@@ -6,6 +6,6 @@ window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5
 /* Future StaffMatch API only — do NOT POST passwords here. No trailing slash. */
 window.STAFFMATCH_API = window.STAFFMATCH_API || 'https://staffmatch-api.onrender.com';
 
-/* Optional hosted app URL. When set (e.g. a future Render static URL; no trailing slash preferred),
-   successful signup / sign-in redirects there. Leave empty until that app is live. */
-window.STAFFMATCH_APP_URL = window.STAFFMATCH_APP_URL || '';
+/* Hosted app URL. Successful signup / sign-in redirects there with session tokens.
+   No trailing slash. */
+window.STAFFMATCH_APP_URL = window.STAFFMATCH_APP_URL || 'https://staffmatch-api.onrender.com';
