@@ -154,7 +154,13 @@ a { color: var(--accent); }
   font-size: 0.88rem;
 }
 .site-foot a { color: var(--muted); }
+.site-foot a:hover { color: var(--ink); }
 .site-foot.inset { padding-left: 0; padding-right: 0; }
+.foot-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
 
 .app-shell {
   max-width: 720px;
@@ -281,6 +287,37 @@ a { color: var(--accent); }
 }
 .terms-list li { margin-bottom: 0.75rem; }
 .terms-list strong { color: var(--ink); }
+
+.page-doc .app-shell {
+  max-width: 760px;
+}
+.page-doc .panel h1 { margin-bottom: 0.35rem; }
+.page-doc h2 {
+  margin: 1.7rem 0 0.45rem;
+  font-size: 1.12rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.page-doc p {
+  color: var(--muted);
+  margin: 0 0 0.85rem;
+}
+.page-doc .panel > p:last-child { margin-bottom: 0; }
+.doc-list {
+  color: var(--muted);
+  margin: 0 0 0.95rem;
+  padding-left: 1.2rem;
+}
+.doc-list li { margin-bottom: 0.55rem; }
+.doc-list strong { color: var(--ink); }
+.page-doc code {
+  font-size: 0.88em;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.08em 0.4em;
+  color: var(--ink);
+}
 
 .hero-title {
   margin: 0 0 1rem;

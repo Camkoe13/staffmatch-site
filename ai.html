@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How we use AI · StaffMatch</title>
+  <meta name="description" content="How StaffMatch uses a language model to extract structured fields from resumes, proposals, and RFPs — and what we store." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=15" />
+</head>
+<body class="page-doc">
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="wordmark" href="index.html">StaffMatch</a>
+      <a class="btn ghost" href="index.html">Back to StaffMatch</a>
+    </header>
+    <main>
+      <article class="panel">
+        <p class="eyebrow">Transparency</p>
+        <h1>How we use AI</h1>
+        <p class="muted">A short account of what a model sees, who hosts it, and what StaffMatch keeps. Last updated September 6, 2026.</p>
+
+        <h2>What a model does — and what it does not</h2>
+        <p>StaffMatch uses a language model for one step: turning uploaded document text into structured fields. Matching people to projects is not a model call.</p>
+        <ul class="doc-list">
+          <li><strong>Extract.</strong> When you add a resume, proposal, or RFP, we pull the text from the file and send that text to a model so it can fill structured fields (for example skills, roles, and requirements). The rest of the product works from those fields.</li>
+          <li><strong>Match.</strong> Ranking compares keywords and overlapping fields with a deterministic score. It does not ask a model who is “best.”</li>
+        </ul>
+        <p>Matching output is assistive. You remain responsible for staffing and proposal decisions.</p>
+
+        <h2>Provider and model</h2>
+        <p>Extract requests go through <a href="https://openrouter.ai/" rel="noopener">OpenRouter</a>. The model ID is set in server configuration, not in this marketing site.</p>
+        <p>Right now we try a free OpenRouter model first. If that route is rate-limited, we fall back to <code>inclusionai/ling-3.0-flash</code>, a paid OpenRouter route.</p>
+
+        <h2>Training</h2>
+        <p>StaffMatch does not train its own models on your documents.</p>
+        <p>OpenRouter is a routing layer in front of an upstream model host. We do not control OpenRouter’s account settings or that host’s training policy, and we cannot promise either from this page.</p>
+        <p>OpenRouter’s public documentation (as of this writing) says:</p>
+        <ul class="doc-list">
+          <li>They do not store prompt or response content unless an account opts in. They do store request metadata such as token counts, latency, and model. See <a href="https://openrouter.ai/docs/guides/privacy/data-collection" rel="noopener">Data Collection</a>.</li>
+          <li>They do not use inputs or outputs to train OpenRouter’s own models. See their <a href="https://openrouter.ai/privacy" rel="noopener">Privacy Policy</a>.</li>
+          <li>Downstream hosts have their own logging and training rules. Free endpoints, in particular, may allow a host to train on requests. OpenRouter documents this on <a href="https://openrouter.ai/docs/guides/privacy/provider-logging" rel="noopener">Provider Logging</a> and on each model page.</li>
+        </ul>
+        <p>If you need a no-training or zero-retention path, that has to be confirmed on OpenRouter and the chosen host. We will not claim it here.</p>
+
+        <h2>What StaffMatch keeps</h2>
+        <ul class="doc-list">
+          <li>We store the structured extract in Postgres.</li>
+          <li>We do not retain original uploaded PDFs by default.</li>
+          <li>If a local JSON file is written on the app server, that path sits on Render’s disk. On the free plan that disk is ephemeral — files there are lost on restart, redeploy, or spin-down.</li>
+        </ul>
+        <p>We do not sell your information. Account passwords go only to Supabase Auth — never by email and never through this site’s marketing forms. See the <a href="pilot-terms.html">Pilot Terms</a>.</p>
+
+        <h2>Questions</h2>
+        <p>Email <a href="mailto:staffmatch.support@gmail.com">staffmatch.support@gmail.com</a>.</p>
+      </article>
+    </main>
+    <footer class="site-foot inset">
+      <span>Independent product — not tied to any employer.</span>
+      <a href="mailto:staffmatch.support@gmail.com?subject=StaffMatch%20inquiry">Inquiries</a>
+    </footer>
+  </div>
+</body>
+</html>

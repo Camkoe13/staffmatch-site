@@ -28,6 +28,8 @@ If config is missing or auth fails, the forms show a clear error and do not cras
 No build step. Settings → Pages → Deploy from branch → `main` / root.
 Expected URL: https://camkoe13.github.io/staffmatch-site/
 
+AI use is documented on `ai.html` (`/ai.html` on Pages).
+
 Supabase Auth → URL configuration should allow:
 
 - Site URL: `https://camkoe13.github.io/staffmatch-site/`
